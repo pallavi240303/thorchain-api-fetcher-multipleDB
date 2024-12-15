@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
-use sqlx::prelude::FromRow;
+// use sqlx::prelude::FromRow;
 
 #[serde_as]
-#[derive(Debug , Serialize , Deserialize , FromRow)]
+#[derive(Debug , Serialize , Deserialize )]
 #[serde(rename_all = "camelCase")]
 pub struct DepthInterval {
     #[serde_as(as = "DisplayFromStr")]

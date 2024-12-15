@@ -12,15 +12,15 @@ mod repositories;
 async fn main() {
     dotenv().ok();
 
-    let mongo_db_name = String::from("thor_api");
-    let mongodb_url = env::var("MONGODB_URI").expect("MONGODB_URI must be set");
-    let db = match match_database_type("mongodb",&[mongodb_url , mongo_db_name]) {
-        Ok(db_type) => DatabaseFactory::create(db_type).await,
-        Err(e) => {
-            eprintln!("Failed to create mongodb database: {}", e);
-            return;
-        }
-    };
+    // let mongo_db_name = String::from("thor_api");
+    // let mongodb_url = env::var("MONGODB_URI").expect("MONGODB_URI must be set");
+    // let db = match match_database_type("mongodb",&[mongodb_url , mongo_db_name]) {
+    //     Ok(db_type) => DatabaseFactory::create(db_type).await,
+    //     Err(e) => {
+    //         eprintln!("Failed to create mongodb database: {}", e);
+    //         return;
+    //     }
+    // };
 
     // let postgres_url = env::var("POSTGRES_URL").expect("POSTGRES_URL must be set");
     // let db = match match_database_type("postgres",&[postgres_url]) {
@@ -31,6 +31,18 @@ async fn main() {
     //     }
     // };
 
+    let surreal_url = env::var("SURREALDB_URL").expect("SURREALDB_URL must be set");
+    let surreal_username = env::var("SURREALDB_USERNAME").expect("SURREALDB_USERNAME must be set");
+    let surreal_password = env::var("SURREALDB_PASSWORD").expect("SURREALDB_PASSWORD must be set");
+
+    let db = match match_database_type("surrealdb", &[surreal_url, surreal_username, surreal_password]) {
+        Ok(db_type) => DatabaseFactory::create(db_type).await,
+        Err(e) => {
+            eprintln!("Failed to create SurrealDB database: {}", e);
+            return;
+        }
+    };
+
     if let Err(e) = db {
         eprintln!("Failed to connect to the database: {}", e);
         return;
@@ -40,7 +52,7 @@ async fn main() {
     println!("DATABASE CONNECTED SUCCESSFULLY!");
 
     let params = IntervalParams {
-        from: 1606780800,
+        from: 1726758000,
         count: 1,
         interval: "hour".to_string(),
     };
@@ -52,7 +64,7 @@ async fn main() {
     };
 
     for interval in depth_data {
-        let duration = db.store_depth_intervals(&interval).await;
+        let duration = db.store_depth_intervals(interval).await;
         println!("Inserted depth intervals in {:?}",duration);
     }
     println!("DEPTH DATA INSERTED SUCCESSFULLY!");
@@ -64,7 +76,7 @@ async fn main() {
     };
 
     for interval in swaps_data {
-        let duration = db.store_swaps_intervals(&interval).await;
+        let duration = db.store_swaps_intervals(interval).await;
         println!("Inserted swap intervals in {:?}",duration);
     }
     println!("SWAP DATA INSERTED SUCCESSFULLY!");
@@ -76,7 +88,7 @@ async fn main() {
     };
 
     for interval in earnings_data {
-        let duration = db.store_earnings_intervals(&interval).await;
+        let duration = db.store_earnings_intervals(interval).await;
         println!("Inserted earnings intervals in {:?}",duration);
     }
     println!("EARNING DATA INSERTED SUCCESSFULLY!");
@@ -88,7 +100,7 @@ async fn main() {
     };
 
     for interval in runepool_data {
-        let duration = db.store_runepool_intervals(&interval).await;
+        let duration = db.store_runepool_intervals(interval).await;
         println!("Inserted runepool intervals in {:?}",duration);
     }
     println!("RUNEPOOL DATA INSERTED SUCCESSFULLY!");
